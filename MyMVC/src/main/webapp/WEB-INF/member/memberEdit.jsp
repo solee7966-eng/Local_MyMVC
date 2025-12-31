@@ -2,7 +2,8 @@
     pageEncoding="UTF-8"%>
     
 <%String ctxPath = request.getContextPath();%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>    
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!DOCTYPE html>
 <html>
@@ -95,6 +96,7 @@
 	                       		 value="${fn:substring(sessionScope.loginUser.mobile, 3, 7)}" />&nbsp;-&nbsp;
 	                       <input type="text" name="hp3" id="hp3" size="6" maxlength="4"
 	                       	     value="${fn:substring(sessionScope.loginUser.mobile, 7, 11)}"/>
+	                       	     
 	                       <span class="error">휴대폰 형식이 아닙니다.</span>
 	                    </td>
 	                </tr>
