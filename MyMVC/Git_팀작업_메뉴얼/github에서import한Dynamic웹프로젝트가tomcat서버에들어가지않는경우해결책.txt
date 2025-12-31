@@ -1,0 +1,15 @@
+1. Dynamic Web Project 마우스 우측 클릭
+
+2. Properties -- Project Facets 에서 
+   Dynamic Web Module 체크
+   Java 체크
+   JavaScript 체크
+
+   Apply 버튼 클릭 
+
+3. Java Build Path -- Libraries 탭에서 Add Library... 클릭하여
+   Server Runtime [Apache Tomcat v10.1] 을 추가한 후
+
+   Apply 버튼 클릭 
+
+4. Apply and Close 버튼 클릭하여 창을 닫는다.

@@ -1,0 +1,15 @@
+@charset "UTF-8";
+
+span {
+	margin-right: 10px;
+}
+
+.stylePoint {
+	background-color: red;
+	color: white;
+}
+
+.purchase {
+	cursor: pointer;
+	color: red;
+}

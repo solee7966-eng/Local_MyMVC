@@ -1,0 +1,76 @@
+@charset "UTF-8";
+
+div#divEditFrm {
+	text-align: center;
+}
+
+table#tblMemberEdit {
+ /*	border: solid 1px red; */ 
+	width: 83%;
+	margin: 1% auto;
+}
+
+table#tblMemberEdit th {
+    border: solid 1px gray; 
+}
+
+table#tblMemberEdit th {
+	height: 60px;
+	background-color: #ffffe6;
+	font-size: 14pt;
+}
+
+table#tblMemberEdit td {
+	line-height: 200%;
+	padding: 1.2% 0;
+}
+
+span.star {
+	color: red;
+	font-weight: bold;
+	font-size: 13pt;
+}
+
+
+table#tblMemberEdit > tbody > tr > td:first-child {
+	width: 20%;
+	font-weight: bold;
+	text-align: left;
+}
+
+table#tblMemberEdit > tbody > tr > td:nth-child(2) {
+	width: 80%;
+	text-align: left;
+}
+
+img#zipcodeSearch {
+	cursor: pointer;
+}
+
+span#emailcheck {
+	border: solid 1px gray;
+	border-radius: 5px;
+	font-size: 8pt;
+	display: inline-block;
+	width: 80px;
+	height: 30px;
+	text-align: center;
+	margin-left: 10px;
+	cursor: pointer;
+}
+
+span.error {
+	color: red;
+}
+
+
+
+
+
+
+
+
+
+
+
+

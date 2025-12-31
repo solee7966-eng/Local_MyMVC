@@ -1,0 +1,22 @@
+1. 자바에서 메일보내기를 하려면 관련 jar 파일을 
+   다운받아서 올려두어야 한다.
+   
+   1). jaf-1_1_1 jar 파일
+   http://www.oracle.com/technetwork/java/jaf11-139815.html 
+   jaf-1_1_1_zip 파일을 다운을 받아서 압축을 푼 후 activation.jar 파일을 
+   /MyMVC/src/main/webapp/WEB-INF/lib 에 복사해둔다.
+   
+   
+   2). javamail-1.4.7 jar 파일   
+   http://www.oracle.com/technetwork/java/javamail/javamail145-1904579.html 
+   Download JavaMail 1.4.7 를 클릭하여 javamail1_4_7.zip 파일을 다운을 받아서 압축을 푼 후 mail.jar 파일을 
+   /MyMVC/src/main/webapp/WEB-INF/lib 에 복사해둔다.
+   
+
+        
+   
+   
+   
+   
+   
+   

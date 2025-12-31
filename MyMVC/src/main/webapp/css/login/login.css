@@ -1,0 +1,44 @@
+@charset "UTF-8";
+
+table#loginTbl {
+	width: 95%;
+	border: solid 1px gray; 
+    border-collapse: collapse;
+	margin: 20px auto 0 auto;
+}
+
+table#loginTbl th {
+	background-color: silver;
+	font-size: 14pt;
+	text-align: center;
+	height: 30px;
+}
+
+table#loginTbl td {
+	border: solid 1px gray;
+	line-height: 30px;
+}
+
+table#loginTbl > tbody > tr:first-child > td:first-child {
+	width: 20%;
+}
+
+table#loginTbl > tbody > tr:first-child > td,
+table#loginTbl > tbody > tr:nth-child(2) > td {
+	padding: 10px;
+}
+
+table#loginTbl > tbody td {
+	border: none;
+}
+
+table#loginTbl > tbody > tr:nth-child(3) > td {
+	text-align: center;
+}
+
+table#loginTbl > tbody > tr:last-child > td {
+	border-top: solid 1px gray;
+	text-align: center;
+	line-height: 50px;
+}
+
