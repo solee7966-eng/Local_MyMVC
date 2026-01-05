@@ -453,3 +453,17 @@ from tbl_board
 order by boardno desc
 OFFSET (6-1)*3 ROW
 FETCH NEXT 3 ROW ONLY;
+
+
+select *
+from tbl_member
+where status = 1 and name like '%'||'강'||'%'
+order by userseq desc;
+
+delete from tbl_member
+where name = '강소라56';
+
+delete from tbl_member
+where userid = 'kangsora54';
+
+commit;

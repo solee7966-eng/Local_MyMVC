@@ -651,6 +651,47 @@ public class MemberDAO_imple implements MemberDAO {
 	}//end of public int getTotalMemberCount(Map<String, String> paraMap) throws SQLException-----
 
 	
+
+	// 뷰단에서 받아온 userid를 이용해 해당 userid에 맞는 회원정보 가져오기
+	@Override
+	public MemberDTO selectOneMember(String userid) throws SQLException {
+		MemberDTO mbDto = null;
+		try {
+			conn = ds.getConnection();
+			
+			String sql = " SELECT userid, name, coin, point, to_char(registerday, 'yyyy-mm-dd') as registerday,"
+						+"		 idle, email, mobile, postcode, address, detailaddress, extraaddress, gender, birthday "
+						+" FROM tbl_member "
+						+" WHERE userid = ? AND status = 1 ";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, userid);
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				mbDto = new MemberDTO();
+				mbDto.setUserid(rs.getString("userid"));
+				mbDto.setName(rs.getString("name"));
+				mbDto.setCoin(rs.getInt("coin"));
+				mbDto.setPoint(rs.getInt("point"));
+				mbDto.setRegisterday(rs.getString("registerday"));
+				mbDto.setIdle(rs.getInt("idle"));
+				mbDto.setEmail(aes.decrypt(rs.getString("email")));
+				mbDto.setMobile(aes.decrypt(rs.getString("mobile")));
+				mbDto.setPostcode(rs.getString("postcode"));
+				mbDto.setAddress(rs.getString("address"));
+				mbDto.setDetailaddress(rs.getString("detailaddress"));
+				mbDto.setExtraaddress(rs.getString("extraaddress"));
+				mbDto.setGender(rs.getString("gender"));
+				mbDto.setBirthday(rs.getString("birthday"));
+			}
+		} 
+		catch (UnsupportedEncodingException | GeneralSecurityException e) {e.printStackTrace();}
+		finally {close();}
+		
+		return mbDto;
+	}
+
+	
 	
 	
 	

@@ -72,6 +72,33 @@
 			frm.submit();
 		})
 		
+		
+		// **** 특정 회원을 클릭하면 그 회원의 상세정보를 보여주도록 한다. **** //
+		$("table#memberTbl tr.memberInfo").click(e => {
+			//alert($(e.target).parent().html());
+			//const userid = $(e.target).parent().find(".userid").text();
+			//--- 또는
+			const userid = $(e.target).parent().children(".userid").text();
+			//alert(userid);
+			
+			const frm = document.memberOneDetailFrm;
+			frm.userid.value = userid; 
+			<%-- frm.action = <%=ctxPath%>; --%>
+			frm.action =  "${pageContext.request.contextPath}/admin/member/memberOneDetail.up";
+			frm.method = "post";
+			frm.submit();
+		<%--  .jsp 파일에서 사용되어지는 것들 
+	        console.log('${pageContext.request.contextPath}');  // 컨텍스트패스   /MyMVC
+	        console.log('${pageContext.request.requestURL}');   // 전체 URL     http://localhost:9090/MyMVC/WEB-INF/member/admin/memberList.jsp
+	        console.log('${pageContext.request.scheme}');       // http        http
+	        console.log('${pageContext.request.serverName}');   // localhost   localhost
+	        console.log('${pageContext.request.serverPort}');   // 포트번호      9090
+	        console.log('${pageContext.request.requestURI}');   // 요청 URI     /MyMVC/WEB-INF/member/admin/memberList.jsp 
+	        console.log('${pageContext.request.servletPath}');  // 파일명       /WEB-INF/member/admin/memberList.jsp 
+	    --%>
+		})
+		
+		
 	});//end of $(function()-----
 			
 			
@@ -151,7 +178,7 @@
        <tbody>
        	  <c:if test="${not empty requestScope.memberList}">
 			 <c:forEach items="${memberList}" var="memberDto" varStatus="status">
-			     <tr>
+			     <tr class="memberInfo">
 			     <%-- >>> 페이징 처리시 보여주는 순번 공식 <<<
                      데이터개수 - (페이지번호 - 1) * 1페이지당보여줄개수 - 인덱스번호 => 순번 
                   
@@ -182,7 +209,7 @@
                     <fmt:parseNumber value="${sizePerPage}" var="sizePerPage"/>
                     
 			        <td>${(requestScope.totalMemberCount) - (currentShowPageNo-1) * sizePerPage - status.index}</td>
-			        <td>${memberDto.userid}</td>
+			        <td class="userid">${memberDto.userid}</td>
 			        <td>${memberDto.name}</td>
 			        <td>${memberDto.email}</td>
 			        <td>
@@ -205,11 +232,20 @@
    </table>
    
    <div id="pageBar">
-             <nav>
-               <ul class="pagination">${pageBar}</ul>
-             </nav>
+      <nav>
+        <ul class="pagination">${pageBar}</ul>
+      </nav>
    </div>
    
 </div>
+
+
+
+<form name="memberOneDetailFrm">
+	<input type="hidden" name="userid"/>
+</form>
+
+
+
 
 <jsp:include page="../../footer2.jsp"/>

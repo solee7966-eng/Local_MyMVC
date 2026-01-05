@@ -52,4 +52,7 @@ public interface MemberDAO {
 
 	// 뷰단(memberList.jsp)에서 "페이징 처리시 보여주는 순번 공식" 에서 사용하기 위해 검색이 있는 또는 검색이 없는 회원의 총개수 알아오기
 	int getTotalMemberCount(Map<String, String> paraMap) throws SQLException;
+
+	// 뷰단에서 받아온 userid를 이용해 해당 userid에 맞는 회원정보 가져오기
+	MemberDTO selectOneMember(String userid) throws SQLException;
 }

@@ -1,5 +1,9 @@
 package member.domain;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class MemberDTO {
 // insert + select 용 
 	private String userid;             // 회원아이디
@@ -138,6 +142,52 @@ public class MemberDTO {
 		this.requirePwdChange = requirePwdChange;
 	}
 	
-
+	
+	
+	// 만 나이 구하는 메서드 //
+	public int getAge() {
+	      int age = 0;
+	      // 회원의 올해생일이 현재날짜 보다 이전이라면 
+	      // 만나이 = 현재년도 - 회원의 태어난년도 
+	      
+	      // 회원의 올해생일이 현재날짜 보다 이후이라면
+	      // 만나이 = 현재년도 - 회원의 태어난년도 - 1
+	      
+	      Date now = new Date(); // 현재시각
+	      SimpleDateFormat sdfmt = new SimpleDateFormat("yyyyMMdd");
+	      String str_now = sdfmt.format(now); // "20260105
+	      
+	      // 회원의 올해생일(문자열 타입)
+	      String str_now_birthday = str_now.substring(0, 4) + birthday.substring(5,7) + birthday.substring(8); 
+	      //   System.out.println("회원의 올해생일(문자열 타입) : " + str_now_birthday);
+	      // 회원의 올해생일(문자열 타입) : 19990424
+	      
+	      // 회원의 태어난년도
+	      int birth_year = Integer.parseInt(birthday.substring(0, 4));
+	      
+	      // 현재년도
+	      int now_year = Integer.parseInt(str_now.substring(0, 4)); 
+	      
+	      try {
+	         Date now_birthday = sdfmt.parse(str_now_birthday); // 회원의 올해생일(연월일) 날짜 타입 
+	         now = sdfmt.parse(str_now); // 오늘날짜(연월일) 날짜타입
+	         
+	         if(now_birthday.before(now)) {
+	            // 회원의 올해생일이 현재날짜 보다 이전이라면
+	            // System.out.println("~~~~ 생일 지남");
+	            age = now_year - birth_year; 
+	            // 나이 = 현재년도 - 회원의 태어난년도
+	         }
+	         else {
+	            // 회원의 올해생일이 현재날짜 보다 이후이라면
+	            // System.out.println("~~~~ 생일 아직 지나지 않음");
+	            age = now_year - birth_year - 1;
+	            // 나이 = 현재년도 - 회원의 태어난년도 - 1
+	         }
+	      } 
+	      catch (ParseException e) {e.printStackTrace();}
+	      return age;
+	   }//end of public int getAge()----- 
+	
 	
 }
