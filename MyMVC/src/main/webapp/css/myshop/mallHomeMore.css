@@ -1,0 +1,8 @@
+@charset "UTF-8";
+
+label.prodInfo {
+ /*	border: solid 1px gray; */
+	display: inline-block;
+	width: 65px;
+	margin-left: 5px; 
+}

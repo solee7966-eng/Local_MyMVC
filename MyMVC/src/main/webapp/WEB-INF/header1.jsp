@@ -104,6 +104,10 @@
 				<%--<%@include file="/WEB-INF/login/login_cookie.jsp" %>--%>
 				<%@include file="/WEB-INF/login/login_localstorage.jsp" %>
 				
+				<%-- == 쇼핑몰 카테고리목록만을 보여주는 부분 (header1.jsp 에만 있음) == --%>
+	            <div id="categoryList" style="margin-top: 100px;">
+	            
+	         	</div> 
 			</div>
 		<div id="sidecontent" style="text-align: left; padding: 20px;"></div>
 		</div>
