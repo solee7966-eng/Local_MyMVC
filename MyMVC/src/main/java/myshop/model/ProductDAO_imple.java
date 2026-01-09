@@ -15,7 +15,7 @@ import javax.sql.DataSource;
 
 import myshop.domain.CategoryDTO;
 import myshop.domain.ImageDTO;
-import myshop.domain.ProuctDTO;
+import myshop.domain.ProductDTO;
 import myshop.domain.SpecDTO;
 
 public class ProductDAO_imple implements ProductDAO {
@@ -96,8 +96,8 @@ public class ProductDAO_imple implements ProductDAO {
 	
 	//더보기 방식(페이징처리)으로 상품정보를 8개씩 잘라서(start ~ end) 조회해오기
 	@Override
-	public List<ProuctDTO> selectBySpecName(Map<String, String> paraMap) throws SQLException {
-		List<ProuctDTO> productList = new ArrayList<ProuctDTO>();
+	public List<ProductDTO> selectBySpecName(Map<String, String> paraMap) throws SQLException {
+		List<ProductDTO> productList = new ArrayList<ProductDTO>();
 		try {
 			conn = ds.getConnection();
 			String sql = " SELECT pnum, pname, C.cname, pcompany, pimage1, pimage2, pqty, price, saleprice, S.sname, pcontent, point "
@@ -139,7 +139,7 @@ public class ProductDAO_imple implements ProductDAO {
 			
 			rs = pstmt.executeQuery();
 			while(rs.next()) {
-				ProuctDTO proDto = new ProuctDTO();
+				ProductDTO proDto = new ProductDTO();
 				proDto.setPnum(rs.getInt("pnum"));
 				proDto.setPname(rs.getString("pname")); // 제품명
 				
@@ -202,6 +202,111 @@ public class ProductDAO_imple implements ProductDAO {
 	      
 	      return categoryList;
 	}//end of public List<CategoryDTO> getCategoryList() throws SQLException-----
+
+
+	
+	//제품스펙 목록 조회하기
+	@Override
+	public List<SpecDTO> getSpecList() throws SQLException {
+		List<SpecDTO> specList = new ArrayList<SpecDTO>();
+		try {
+			conn = ds.getConnection();
+			String sql = " SELECT snum, sname "
+						+" FROM tbl_spec ";
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				SpecDTO sDto = new SpecDTO();
+				sDto.setSnum(rs.getInt("snum"));
+				sDto.setSname(rs.getString("sname"));
+				specList.add(sDto);
+			}
+			
+		} finally {close();}
+		return specList;
+	}//end of public List<SpecDTO> getSpecList() throws SQLException-----
+
+
+	//제품번호 채번 해오기
+	@Override
+	public int getPnumOfProduct() throws SQLException {
+		int pnum = 0;
+	      
+		try {
+			conn = ds.getConnection();
+         
+			String sql = " select seq_tbl_product_pnum.nextval AS PNUM "
+						+" from dual ";
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+         
+            rs.next();
+            pnum = rs.getInt(1);
+         
+		} finally {close();}
+		return pnum;
+	}//end of public int getPnumOfProduct() throws SQLException-----
+
+
+	//tbl_product 테이블에 제품정보 insert 하기
+	@Override
+	public int productInsert(ProductDTO proDto) throws SQLException {
+		int result = 0;
+		try {
+			conn = ds.getConnection();
+			
+			String sql = " insert into tbl_product(pnum, pname, fk_cnum, pcompany, pimage1, pimage2, prdmanual_systemFileName, prdmanual_orginFileName, pqty, price, saleprice, fk_snum, pcontent, point) "
+			         + " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?) ";
+	         
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, proDto.getPnum());
+			pstmt.setString(2, proDto.getPname());
+			pstmt.setInt(3, proDto.getFk_cnum());    
+			pstmt.setString(4, proDto.getPcompany()); 
+			pstmt.setString(5, proDto.getPimage1());    
+			pstmt.setString(6, proDto.getPimage2()); 
+			pstmt.setString(7, proDto.getPrdmanual_systemFileName());
+			pstmt.setString(8, proDto.getPrdmanual_orginFileName());
+			pstmt.setInt(9, proDto.getPqty()); 
+			pstmt.setInt(10, proDto.getPrice());
+			pstmt.setInt(11, proDto.getSaleprice());
+			pstmt.setInt(12, proDto.getFk_snum());
+			pstmt.setString(13, proDto.getPcontent());
+			pstmt.setInt(14, proDto.getPoint());
+			
+			result = pstmt.executeUpdate();
+	         
+	      } finally {close();}
+	      
+			return result;
+	}//end of public int productInsert(ProductDTO proDto) throws SQLException-----
+
+
+	//tbl_product_imagefile 테이블에 제품의 추가이미지 파일명 insert 하기
+	@Override
+	public int product_imagefile_insert(Map<String, String> paraMap) throws SQLException {
+		int result = 0;
+	      
+	      try {
+	         conn = ds.getConnection();
+	         
+	         String sql = " insert into tbl_product_imagefile(imgfileno, fk_pnum, imgfilename) "
+	                  + " values(seqImgfileno.nextval, ?, ?) ";
+	         
+	         pstmt = conn.prepareStatement(sql);
+	         
+	         pstmt.setInt(1, Integer.parseInt(paraMap.get("pnum")) );
+	         pstmt.setString(2, paraMap.get("attachFileName"));
+	         
+	         result = pstmt.executeUpdate();
+	         
+	      } finally {
+	         close();
+	      }
+	      
+	      return result;   
+	}//end of public int product_imagefile_insert(Map<String, String> paraMap) throws SQLException-----
 	
 	
 	

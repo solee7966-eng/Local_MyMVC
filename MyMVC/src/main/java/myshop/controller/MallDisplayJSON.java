@@ -10,7 +10,7 @@ import org.json.JSONObject;
 import common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import myshop.domain.ProuctDTO;
+import myshop.domain.ProductDTO;
 import myshop.model.ProductDAO;
 import myshop.model.ProductDAO_imple;
 
@@ -42,13 +42,13 @@ public class MallDisplayJSON extends AbstractController {
 		String end = String.valueOf((Integer.parseInt(start) + Integer.parseInt(len) - 1));
 		paraMap.put("end", end);
 		
-		List<ProuctDTO> productList = pdDao.selectBySpecName(paraMap);
+		List<ProductDTO> productList = pdDao.selectBySpecName(paraMap);
 		
 		//json 형태의 배열로 변환해주기
 		JSONArray jsonArr = new JSONArray(); // []
 		if(productList.size() > 0) {
 			//DB에서 조회해온 결과물이 있는 경우
-			for(ProuctDTO proDto : productList ) {
+			for(ProductDTO proDto : productList ) {
 				JSONObject jsonObj = new JSONObject();
 				jsonObj.put("pnum", proDto.getPnum());
 				jsonObj.put("pname", proDto.getPname());

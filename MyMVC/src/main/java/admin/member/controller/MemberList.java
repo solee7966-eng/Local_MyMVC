@@ -18,7 +18,7 @@ public class MemberList extends AbstractController {
 	
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		//관리자(admint)로 로그인했을 때만 회원조회가 가능하도록 
+		//관리자(admint)로 로그인했을 때만 회원조회가 가능하도록
 		HttpSession session = request.getSession();
 		MemberDTO loginUser = (MemberDTO)session.getAttribute("loginUser");
 		

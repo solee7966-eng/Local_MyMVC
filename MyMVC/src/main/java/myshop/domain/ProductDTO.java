@@ -1,6 +1,6 @@
 package myshop.domain;
 
-public class ProuctDTO {
+public class ProductDTO {
 	private int    pnum;       // 제품번호
 	private String    pname;      // 제품명
 	private int     fk_cnum;    // 카테고리코드(Foreign Key)의 시퀀스번호 참조
@@ -26,9 +26,9 @@ public class ProuctDTO {
 	private int totalPrice;         // 판매당시의 제품판매가(saleprice) * 주문량
 	private int totalPoint;         // 판매당시의 포인트점수(point) * 주문량
 	
-	public ProuctDTO() {}
+	public ProductDTO() {}
 	
-	public ProuctDTO(int pnum, String pname, int fk_cnum, String pcompany, String pimage1, String pimage2,
+	public ProductDTO(int pnum, String pname, int fk_cnum, String pcompany, String pimage1, String pimage2,
 			String prdmanual_systemFileName, String prdmanual_orginFileName, int pqty, int price, int saleprice,
 			int fk_snum, String pcontent, int point, String pinputdate) {
 		super();

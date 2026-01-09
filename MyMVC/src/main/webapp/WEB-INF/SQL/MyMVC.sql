@@ -523,15 +523,15 @@ commit;
 insert into tbl_category(cnum, code, cname) values(seq_category_cnum.nextval, '500000', '신발');
 commit;
 
-/*
+
 delete from tbl_category
 where code = '500000';
+commit;
 
 delete from tbl_category
 where code = '400000';
-
 commit;
-*/
+
 
 select cnum, code, cname
 from tbl_category
@@ -898,3 +898,7 @@ SELECT count(*)
 FROM tbl_product
 WHERE fk_snum = 1;
 
+
+
+SELECT snum, sname
+FROM tbl_spec;
