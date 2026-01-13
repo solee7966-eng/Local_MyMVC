@@ -5,6 +5,7 @@
 
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/myshop/mallHomeMore.css" /> 
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/myshop/mallHomeMore.js"></script>
+
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/myshop/categoryList.js"></script>
 
 

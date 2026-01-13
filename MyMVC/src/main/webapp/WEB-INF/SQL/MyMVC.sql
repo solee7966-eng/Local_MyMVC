@@ -902,3 +902,68 @@ WHERE fk_snum = 1;
 
 SELECT snum, sname
 FROM tbl_spec;
+
+select * from tbl_product;
+
+
+
+
+----- >>> 하나의 제품속에 여러개의 이미지 파일 넣어주기 <<< ------ 
+create table tbl_product_imagefile
+(imgfileno     number         not null   -- 시퀀스로 입력받음.
+,fk_pnum       number(8)      not null   -- 제품번호(foreign key)
+,imgfilename   varchar2(100)  not null   -- 제품이미지파일명
+,constraint PK_tbl_product_imagefile primary key(imgfileno)
+,constraint FK_tbl_product_imagefile foreign key(fk_pnum) references tbl_product(pnum) on delete cascade 
+);
+-- Table TBL_PRODUCT_IMAGEFILE이(가) 생성되었습니다.
+
+create sequence seqImgfileno
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+-- Sequence SEQIMGFILENO이(가) 생성되었습니다.
+
+select imgfileno, fk_pnum, imgfilename
+from tbl_product_imagefile
+order by imgfileno desc;
+
+select * from tbl_product
+order by pnum desc;
+
+
+
+
+SELECT sname, pnum, pname, pcompany, price, saleprice, point, pqty, 
+       pcontent, pimage1, pimage2, prdmanual_systemFileName, 
+       NVL(prdmanual_orginFileName, '없음') AS prdmanual_orginFileName
+FROM
+(
+select fk_snum, pnum, pname, pcompany, price, saleprice, point, pqty, 
+       pcontent, pimage1, pimage2, prdmanual_systemFileName, prdmanual_orginFileName
+from tbl_product
+where pnum = to_number('119')
+) P
+JOIN tbl_spec S
+ON P.fk_snum = S.snum;
+
+
+SELECT imgfileno
+FROM tbl_product_imagefile
+WHERE fk_pnum = '119'
+ORDER BY imgfileno desc;
+
+
+
+
+
+select PRDMANUAL_SYSTEMFILENAME, PRDMANUAL_ORGINFILENAME
+from tbl_product
+where pnum = 119; --결과 있음
+
+select PRDMANUAL_SYSTEMFILENAME, PRDMANUAL_ORGINFILENAME
+from tbl_product
+where pnum = 32; --결과 없음

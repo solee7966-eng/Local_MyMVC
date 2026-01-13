@@ -1,5 +1,7 @@
 package myshop.domain;
 
+import java.util.List;
+
 public class ProductDTO {
 	private int    pnum;       // 제품번호
 	private String    pname;      // 제품명
@@ -19,6 +21,9 @@ public class ProductDTO {
 	
 	private CategoryDTO categdto; // 카테고리DTO 
 	private SpecDTO spdto;        // 스펙DTO 
+	
+	private List<String> imgList;	//추가 이미지들
+	
 	/*
 	    제품판매가와 포인트점수 컬럼의 값은 관리자에 의해서 변경(update)될 수 있으므로
 	    해당 제품의 판매총액과 포인트부여 총액은 판매당시의 제품판매가와 포인트 점수로 구해와야 한다.  
@@ -26,11 +31,12 @@ public class ProductDTO {
 	private int totalPrice;         // 판매당시의 제품판매가(saleprice) * 주문량
 	private int totalPoint;         // 판매당시의 포인트점수(point) * 주문량
 	
+	
 	public ProductDTO() {}
 	
 	public ProductDTO(int pnum, String pname, int fk_cnum, String pcompany, String pimage1, String pimage2,
 			String prdmanual_systemFileName, String prdmanual_orginFileName, int pqty, int price, int saleprice,
-			int fk_snum, String pcontent, int point, String pinputdate) {
+			int fk_snum, String pcontent, int point, String pinputdate, List<String> imgList) {
 		super();
 		this.pnum = pnum;
 		this.pname = pname;
@@ -47,6 +53,8 @@ public class ProductDTO {
 		this.pcontent = pcontent;
 		this.point = point;
 		this.pinputdate = pinputdate;
+		
+		this.imgList = imgList;
 	}
 
 	public int getPnum() {
@@ -218,8 +226,14 @@ public class ProductDTO {
 		return 100 - (saleprice*100)/price;
 	}
 
+	
+	public List<String> getImgList() {
+		return imgList;
+	}
 
-
+	public void setImgList(List<String> imgList) {
+		this.imgList = imgList;
+	}
 
 
 

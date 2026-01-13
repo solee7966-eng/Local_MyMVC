@@ -62,6 +62,23 @@
 			</li>
 			
 			
+			<!-- admin이 아닌 일반 사용자로 로그인한 경우에만 뜨도록 하기 -->
+			<!-- 추가로 경로로 인해 관리자 페이지에 접속할 수도 있으므로 이에 대한 코딩작업도 해주어야 함! -->
+			<c:if test="${not empty sessionScope.loginUser && sessionScope.loginUser.userid != 'admin'}">
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle menufont_size text-info" href="#" id="navbarDropdown" data-toggle="dropdown">
+						장바구니/주문
+					</a>
+					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+						<a class="dropdown-item text-info" href="<%=ctxPath%>/shop/cartList.up">장바구니</a>
+						<a class="dropdown-item text-info" href="<%=ctxPath%>/shop.orderList.up">나의주문내역</a>
+					<div class="dropdown-divider"></div>
+						<a class="dropdown-item text-info" href="<%=ctxPath%>/shop/chart.up">주문통계차트보기</a>
+					</div>
+				</li>
+			</c:if>
+			
+			
 			
 			<!-- admin으로 로그인한 경우에만 뜨도록 하기 -->
 			<!-- 추가로 경로로 인해 관리자 페이지에 접속할 수도 있으므로 이에 대한 코딩작업도 해주어야 함! -->

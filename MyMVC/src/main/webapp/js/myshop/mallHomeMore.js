@@ -74,21 +74,14 @@ function displayHIT(start) { // start가  1 이라면   1 ~  8  까지 상품 8�
             v_html = `현재 상품 준비중 입니다...`;
             $('div#displayHIT').html(v_html);
          }
-         
          else if(json.length > 0) {
             // 데이터가 존재하는 경우 
-            
             /*
                // 자바스크립트를 사용하는 경우
-               json.forEach(function(item, index, array){
-               
-               });
-               
+               json.forEach(function(item, index, array){});
                
                // jQuery 를 사용하는 경우
-               $.each(json, function(index, item){
-               
-               });
+               $.each(json, function(index, item){});
             */
             json.forEach(function(item, index, array){
                v_html += `<div class='col-md-6 col-lg-3'>
@@ -104,9 +97,9 @@ function displayHIT(start) { // start가  1 이라면   1 ~  8  까지 상품 8�
                                             <li class='text-center'><a href='/MyMVC/shop/prodView.up?pnum=${item.pnum}' class='btn btn-sm btn-outline-dark stretched-link' role='button'>자세히보기</a></li>
                                             ${''/* 카드 내부의 링크에 .stretched-link 클래스를 추가하면 전체 카드를 클릭할 수 있고 호버링할 수 있습니다(카드가 링크 역할을 함). */}  
                                  </ul>
-                             </div>  
+                             </div>
                            </div>
-                          </div>`;               
+                          </div>`;
             });// end of json.forEach(function(item, index, array){})-------------
             
             // HIT 상품 결과를 출력하기
@@ -130,9 +123,9 @@ function displayHIT(start) { // start가  1 이라면   1 ~  8  까지 상품 8�
                $('button#btnMoreHIT').text("처음으로");
                $('span#countHIT').text("0");
             }
-            
+
          }// end of else if(json.length > 0)-----------------------
-         
+
       },
       error: function(request, status, error){
          alert("code: "+request.status+"\n"+"message: "+request.responseText+"\n"+"error: "+error);

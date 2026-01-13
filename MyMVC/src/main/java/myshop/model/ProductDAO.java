@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import myshop.domain.CartDTO;
 import myshop.domain.CategoryDTO;
 import myshop.domain.ImageDTO;
 import myshop.domain.ProductDTO;
@@ -33,4 +34,30 @@ public interface ProductDAO {
 
 	   //tbl_product_imagefile 테이블에 제품의 추가이미지 파일명 insert 하기
 	   int product_imagefile_insert(Map<String, String> paraMap) throws SQLException;
+
+	   //제품번호를 가지고서 해당 제품의 정보를 조회해오기
+	   ProductDTO selectOneProductByPnum(String pnum) throws SQLException;
+
+	   //제품번호를 이용해 해당 제품의 추가된 이미지 정보를 조회해오기
+	   List<String> getImagesByPnum(String pnum) throws SQLException;
+
+	   //시스템에 업로드 되어진 파일설명서 첨부파일명 및 오리지널파일명 알아오기
+	   Map<String, String> getPrdmanualFileName(String pnum) throws SQLException;
+
+	   //장바구니 테이블(tbl_cart)에 해당 제품을 담아야 한다.
+	   //장바구니 테이블에 해당 제품이 존재하지 않는 경우에는 tbl_cart 테이블에 insert 를 해야하고, 
+	   //장바구니 테이블에 해당 제품이 존재하는 경우에는 또 그 제품을 추가해서 장바구니 담기를 한다라면 tbl_cart 테이블에 update 를 해야한다. 
+	   int addCart(Map<String, String> paraMap) throws SQLException;
+
+	   //로그인 한 사용자의 장바구니 목록을 조회하기
+	   List<CartDTO> selectProductCart(String userid) throws SQLException;
+
+	   //로그인한 사용자의 장바구니에 담긴 주문총액합계 및 총포인트합계 알아오기
+	   Map<String, Integer> selectCartSumPricePoint(String userid) throws SQLException;
+	   
+	   
+	   
+	   
+	   
+	   
 }

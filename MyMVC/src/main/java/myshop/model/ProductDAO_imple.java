@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import myshop.domain.CartDTO;
 import myshop.domain.CategoryDTO;
 import myshop.domain.ImageDTO;
 import myshop.domain.ProductDTO;
@@ -307,6 +309,267 @@ public class ProductDAO_imple implements ProductDAO {
 	      
 	      return result;   
 	}//end of public int product_imagefile_insert(Map<String, String> paraMap) throws SQLException-----
+
+
+	//제품번호를 가지고서 해당 제품의 정보를 조회해오기
+	@Override
+	public ProductDTO selectOneProductByPnum(String pnum) throws SQLException {
+		ProductDTO proDto = null;
+		try {
+			conn = ds.getConnection();
+			String sql = " SELECT sname, pnum, pname, pcompany, price, saleprice, point, pqty, pcontent,"
+						+"		  pimage1, pimage2, prdmanual_systemFileName, NVL(prdmanual_orginFileName, '없음') AS prdmanual_orginFileName "
+		                +" FROM "
+		                +" ( "
+		                +"  select fk_snum, pnum, pname, pcompany, price, saleprice, point, pqty, pcontent, "
+		                +"         pimage1, pimage2, prdmanual_systemFileName, prdmanual_orginFileName "
+		                +"  from tbl_product "
+		                +"  where pnum = to_number(?) "
+		                +" ) P "
+		                +" JOIN tbl_spec S "
+		                +" ON P.fk_snum = S.snum ";
+			
+			pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, pnum);
+	        rs = pstmt.executeQuery();
+	        
+	        if(rs.next()) {
+	        	proDto = new ProductDTO();
+	           
+	            proDto.setPnum(rs.getInt("PNUM"));            // 제품번호
+	            proDto.setPname(rs.getString("PNAME"));       // 제품명
+	            proDto.setPcompany(rs.getString("PCOMPANY")); // 제조회사명
+	            proDto.setPimage1(rs.getString("PIMAGE1"));   // 제품이미지1   이미지파일명
+	            proDto.setPimage2(rs.getString("PIMAGE2"));   // 제품이미지2   이미지파일명
+	            proDto.setPqty(rs.getInt("PQTY"));            // 제품 재고량
+	            proDto.setPrice(rs.getInt("PRICE"));          // 제품 정가
+	            proDto.setSaleprice(rs.getInt("SALEPRICE"));  // 제품 판매가(할인해서 팔 것이므로)
+	            
+	            SpecDTO spDTO = new SpecDTO();
+	            spDTO.setSname(rs.getString("SNAME")); // 스펙명
+	            
+	            proDto.setSpdto(spDTO);
+	            
+	            proDto.setPcontent(rs.getString("PCONTENT"));      // 제품설명 
+	            proDto.setPoint(rs.getInt("POINT"));              // 포인트 점수        
+	            
+	            proDto.setPrdmanual_systemFileName(rs.getString("PRDMANUAL_SYSTEMFILENAME")); // 파일서버에 업로드되어지는 실제 제품설명서 파일명
+	            proDto.setPrdmanual_orginFileName(rs.getString("PRDMANUAL_ORGINFILENAME"));   // 웹클라이언트의 웹브라우저에서 파일을 업로드 할때 올리는 제품설명서 파일명
+	        }// end of if(rs.next())-------------------------
+	         
+	      } finally {close();}
+		return proDto;
+	}//end of public ProductDTO selectOneProductByPnum(String pnum) throws SQLException-----
+
+
+	
+	//제품번호를 이용해 해당 제품의 추가된 이미지 정보를 조회해오기
+	@Override
+	public List<String> getImagesByPnum(String pnum) throws SQLException {
+		List<String> imgList = new ArrayList<String>();
+		try {
+	         conn = ds.getConnection();
+	         
+	         String sql = " SELECT imgfilename "+
+	                      " FROM tbl_product_imagefile "+
+	                      " WHERE fk_pnum = TO_NUMBER(?) "+
+	                      " ORDER BY imgfileno DESC ";
+	         
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setString(1, pnum);
+	         
+	         rs = pstmt.executeQuery();
+	         
+	         while(rs.next()) {
+	            String imgfilename = rs.getString(1); // 이미지파일명 
+	            imgList.add(imgfilename); 
+	         }
+			
+		} finally {close();}
+		
+		return imgList;
+	}//end of public List<String> getImagesByPnum(String pnum) throws SQLException-----
+
+
+	
+	//시스템에 업로드 되어진 파일설명서 첨부파일명 및 오리지널파일명 알아오기
+	@Override
+	public Map<String, String> getPrdmanualFileName(String pnum) throws SQLException {
+		Map<String, String> map = new HashMap<String, String>();
+		try {
+			conn = ds.getConnection();
+			String sql = " select PRDMANUAL_SYSTEMFILENAME, PRDMANUAL_ORGINFILENAME "
+	                  + " from tbl_product "
+	                  + " where pnum = to_number(?) ";
+			pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, pnum);
+	        rs = pstmt.executeQuery();
+	        
+	        if(rs.next()) {
+	        	// 파일서버에 업로드되어진 실제 제품설명서 파일명
+	            map.put("PRDMANUAL_SYSTEMFILENAME", rs.getString("PRDMANUAL_SYSTEMFILENAME"));
+	            
+	            // 웹클라이언트의 웹브라우저에서 파일을 업로드 할때 올리는 제품설명서 파일명 
+	            map.put("PRDMANUAL_ORGINFILENAME", rs.getString("PRDMANUAL_ORGINFILENAME"));
+	        }
+			
+		} finally {close();}
+		return map;
+	}//end of public Map<String, String> getPrdmanualFileName(String pnum) throws SQLException-----
+
+
+	
+	//장바구니 담기 
+    //장바구니 테이블(tbl_cart)에 해당 제품을 담아야 한다.
+    //장바구니 테이블에 해당 제품이 존재하지 않는 경우에는 tbl_cart 테이블에 insert 를 해야하고, 
+    //장바구니 테이블에 해당 제품이 존재하는 경우에는 또 그 제품을 추가해서 장바구니 담기를 한다라면 tbl_cart 테이블에 update 를 해야한다.
+	@Override
+	public int addCart(Map<String, String> paraMap) throws SQLException {
+		int n = 0;
+		try {
+			conn = ds.getConnection();
+			/*
+	           먼저 장바구니 테이블(tbl_cart)에 어떤 회원이 새로운 제품을 넣는 것인지,
+	           아니면 또 다시 제품을 추가로 더 구매하는 것인지를 알아야 한다.
+	           이것을 알기 위해서 어떤 회원이 어떤 제품을 장바구니 테이블(tbl_cart) 넣을때
+	           그 제품이 이미 존재하는지 select 를 통해서 알아와야 한다.
+	           
+	         -------------------------------------------
+	          cartno   fk_userid     fk_pnum   oqty  
+	         -------------------------------------------
+	            1      seoyh          7        12     
+	            2      seoyh          6         3     
+	            3      leess          7         5     
+	        */
+			String sql = " SELECT cartno "
+						+" FROM tbl_cart"
+						+" WHERE fk_userid = ? AND fk_pnum = ? ";
+			pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, paraMap.get("userid"));
+	        pstmt.setString(2, paraMap.get("pnum"));
+	        rs = pstmt.executeQuery();
+	        
+	        if(rs.next()) {
+	        	// 어떤 제품을 추가로 장바구니에 넣고자 하는 경우
+	        	sql = " UPDATE tbl_cart SET oqty = oqty + ? "
+	        		 +" WHERE cartno = ? ";
+	        	pstmt = conn.prepareStatement(sql);
+	        	pstmt.setInt(1, Integer.parseInt(paraMap.get("oqty")));
+	        	pstmt.setInt(2, rs.getInt("cartno"));
+	        	n = pstmt.executeUpdate();
+	        	
+	        } else {
+	        	// 장바구니에 존재하지 않는 새로운 제품을 넣고자 하는 경우
+	        	sql = " insert into tbl_cart(cartno, fk_userid, fk_pnum, oqty, registerday) "
+	                 +" values(seq_tbl_cart_cartno.nextval, ?, ?, ?, default) ";
+	        	pstmt = conn.prepareStatement(sql);
+	            pstmt.setString(1, paraMap.get("userid"));
+	            pstmt.setInt(2, Integer.parseInt(paraMap.get("pnum")));
+	            pstmt.setInt(3, Integer.parseInt(paraMap.get("oqty")));
+	            n = pstmt.executeUpdate();
+	        }
+		} finally {close();}
+		
+		return n;
+	}//end of public int addCart(Map<String, String> paraMap) throws SQLException-----
+
+
+	//로그인 한 사용자의 장바구니 목록을 조회하기
+	@Override
+	public List<CartDTO> selectProductCart(String userid) throws SQLException {
+		List<CartDTO> cartList = null;
+		
+		try {
+		   conn = ds.getConnection();
+		   
+		   String sql =  " SELECT C.cartno, C.fk_userid, C.fk_pnum, C.oqty, P.pname, P.pimage1, P.saleprice, P.point, P.pqty "
+		            + " FROM "
+		            + " (select cartno, fk_userid, fk_pnum, oqty, registerday "
+		            + "  from tbl_cart "
+		            + "  where fk_userid = ?) C "
+		            + " JOIN tbl_product P "
+		            + " ON C.fk_pnum = P.pnum "
+		            + " ORDER BY C.cartno DESC ";
+		   pstmt = conn.prepareStatement(sql);
+		   pstmt.setString(1, userid);
+		   
+		   rs = pstmt.executeQuery();
+		   
+		   int cnt = 0;
+		   while(rs.next()) {
+			   cnt++;
+			   if(cnt == 1) {
+				   cartList = new ArrayList<CartDTO>();
+			   }
+			   
+			   int cartno = rs.getInt("CARTNO");
+	           String fk_userid = rs.getString("FK_USERID");
+	           int fk_pnum = rs.getInt("FK_PNUM");
+	           int oqty = rs.getInt("OQTY"); // 주문량
+	           
+	           String pname = rs.getString("PNAME");
+	           String pimage1 = rs.getString("PIMAGE1");
+	           int saleprice = rs.getInt("SALEPRICE");
+	           int point = rs.getInt("POINT"); 
+	           int pqty = rs.getInt("PQTY"); // 잔고량
+	           
+	           ProductDTO proDto = new ProductDTO();
+	           proDto.setPnum(fk_pnum);
+	           proDto.setPname(pname);
+	           proDto.setPimage1(pimage1);
+	           proDto.setSaleprice(saleprice);
+	           proDto.setPoint(point);
+	           proDto.setPqty(pqty);
+	           
+	           // ***** 중요!!!! ***** //
+	           //주문량만 넣으면 DTO 단에 만들어놓은 메서드로 알아서 수량과 가격을 곱하여 계산함
+	           proDto.setTotalPriceTotalPoint(oqty); 
+	           
+	           CartDTO cartDto = new CartDTO();
+	           cartDto.setCartno(cartno);
+	           cartDto.setFk_userid(fk_userid);
+	           cartDto.setFk_pnum(fk_pnum);
+	           cartDto.setOqty(oqty);
+	           cartDto.setpDto(proDto);
+	           
+	           cartList.add(cartDto);
+	           
+		   }//end of while()-----
+		   
+		} finally {close();}
+		return cartList;
+	}//end of public List<CartDTO> selectProductCart(String userid) throws SQLException-----
+
+
+	
+	//로그인한 사용자의 장바구니에 담긴 주문총액합계 및 총포인트합계 알아오기
+	@Override
+	public Map<String, Integer> selectCartSumPricePoint(String userid) throws SQLException {
+		Map<String, Integer> sumMap = new HashMap<String, Integer>();
+		try {
+	         conn = ds.getConnection();
+	         
+	         String sql = " SELECT NVL(SUM(C.oqty * P.saleprice), 0) AS SUMTOTALPRICE "
+	                  + "      , NVL(SUM(C.oqty * P.point), 0) AS SUMTOTALPOINT "
+	                  + " FROM "
+	                  + " ( select fk_pnum, oqty "
+	                  + "   from tbl_cart "
+	                  + "   where fk_userid = ? ) C "
+	                  + " JOIN tbl_product P "
+	                  + " ON C.fk_pnum = P.pnum ";
+	         
+	         pstmt = conn.prepareStatement(sql);
+	         pstmt.setString(1, userid);
+	         rs = pstmt.executeQuery();
+	         rs.next();
+	         
+	         sumMap.put("SUMTOTALPRICE", rs.getInt("SUMTOTALPRICE"));
+	         sumMap.put("SUMTOTALPOINT", rs.getInt("SUMTOTALPOINT"));
+	         
+		} finally {close();}
+		
+		return sumMap;
+	}//end of public Map<String, Integer> selectCartSumPricePoint(String userid) throws SQLException-----
 	
 	
 	
