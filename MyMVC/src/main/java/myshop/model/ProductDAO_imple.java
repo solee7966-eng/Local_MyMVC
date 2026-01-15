@@ -570,6 +570,271 @@ public class ProductDAO_imple implements ProductDAO {
 		
 		return sumMap;
 	}//end of public Map<String, Integer> selectCartSumPricePoint(String userid) throws SQLException-----
+
+
+	//장바구니 테이블에서 특정제품의 주문량 변경시키기
+	@Override
+	public int updateCart(Map<String, String> paraMap) throws SQLException {
+		int n = 0;
+		try {
+			conn = ds.getConnection();
+	        String sql = " update tbl_cart set oqty = to_number(?) "
+	                    +" where cartno = to_number(?) ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, paraMap.get("oqty"));
+	        pstmt.setString(2, paraMap.get("cartno"));
+	        
+	        n = pstmt.executeUpdate();
+		}
+		finally {close();}
+		return n;
+	}//end of public int updateCart(Map<String, String> paraMap) throws SQLException-----
+
+
+	
+	//장바구니 테이블에서 특정제품을 삭제하기
+	@Override
+	public int deleteCart(String cartno) throws SQLException {
+		int n = 0;
+		try {
+			conn = ds.getConnection();
+	        String sql = " DELETE FROM tbl_cart "
+	                    +" WHERE cartno = to_number(?) ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, cartno);
+	        
+	        n = pstmt.executeUpdate();
+		}
+		finally {close();}
+		return n;
+	}//end of public int deleteCart(String cartno) throws SQLException-----
+
+
+	//주문번호(시퀀스 seq_tbl_order 값)을 채번해오는 것.
+	@Override
+	public int get_seq_tbl_order() throws SQLException {
+		int seq = 0;
+		try {
+	          conn = ds.getConnection();
+	          String sql = " select seq_tbl_order.nextval AS seq "
+	                    + " from dual";
+	             
+	          pstmt = conn.prepareStatement(sql);
+	          rs = pstmt.executeQuery();
+	          rs.next();
+	          seq = rs.getInt("seq");
+		} finally {
+	           close();
+		}
+
+		return seq;
+	}//end of public int get_seq_tbl_order() throws SQLException-----
+
+
+	
+	
+	   // *** Transaction 처리를 해주는 메소드 호출하기 *** //
+    // 2. 주문 테이블에 채번해온 주문전표, 로그인한 사용자, 현재시각을 insert 하기(수동커밋처리) 
+    // 3. 주문상세 테이블에 채번해온 주문전표, 제품번호, 주문량, 주문금액을 insert 하기(수동커밋처리)
+    // 4. 제품 테이블에서 제품번호에 해당하는 잔고량을 주문량 만큼 감하기 update 하기(수동커밋처리)
+    // 5. 장바구니 테이블에서 str_cartno_join 값에 해당하는 행들을 삭제(delete)하기(수동커밋처리)
+    // >> 장바구니에서 주문을 한 것이 아니라 특정제품을 바로주문하기를 한 경우에는 장바구니 테이블에서 행들을 삭제할 작업은 없다. <<
+    // 6. 회원 테이블에서 로그인한 사용자의 coin 액을 sum_totalPrice 만큼 감하고, point 를 sum_totalPoint 만큼 더하기(update)(수동커밋처리)
+    // 7. **** 모든처리가 성공되었을시 commit 하기(commit) ****
+    // 8. **** SQL 장애 발생시 rollback 하기(rollback) ****
+	@Override
+	public int orderAdd(Map<String, Object> paraMap) throws SQLException {
+		int isSuccess = 0;
+		int n1=0, n2=0, n3=0, n4=0, n5=0;
+		
+		try {
+			conn = ds.getConnection();
+			conn.setAutoCommit(false); //수동 커밋으로 전환
+			
+			//2. 주문 테이블에 채번해온 주문전표, 로그인한 사용자, 현재시각을 insert 하기(수동커밋처리)
+			String sql = " insert into tbl_order(odrcode, fk_userid, odrtotalPrice, odrtotalPoint, odrdate) "
+	                   + " values(?, ?, ?, ?, default) ";
+			pstmt = conn.prepareStatement(sql);
+	        pstmt.setString(1, (String)paraMap.get("odrcode"));
+	        pstmt.setString(2, (String)paraMap.get("userid"));
+	        pstmt.setInt(3, Integer.parseInt((String)paraMap.get("totalPrice")));
+	        pstmt.setInt(4, Integer.parseInt((String)paraMap.get("totalPoint")));
+	        
+	        n1 = pstmt.executeUpdate();
+	        System.out.println("확인용 n1: " +n1);
+			
+	        
+	        //3. 주문상세 테이블에 채번해온 주문전표, 제품번호, 주문량, 주문금액을 insert 하기(수동커밋처리)
+	        if(n1 == 1) {
+	        	//주문코드(명세서 번호) ==> (String)paraMap.get("odrcode")
+	        	String[] arr_pnum = (String[]) paraMap.get("arr_pnum"); //제품번호
+	        	String[] arr_oqty = (String[]) paraMap.get("arr_oqty"); //주문량
+	        	String[] arr_totalPrice = (String[]) paraMap.get("arr_totalPrice"); //주문가격
+	        	
+	        	//위 배열들의 길이는 모두 똑같으므로 아무거나 사용해주기
+	        	int cnt = 0;
+	        	for(int i=0; i<arr_pnum.length; i++) {
+	        		sql = " insert into tbl_orderdetail(odrseqnum, fk_odrcode, fk_pnum, oqty, odrprice, deliverStatus) " 
+	                        + " values(seq_tbl_orderdetail.nextval, ?, to_number(?), to_number(?), to_number(?), default ) ";
+	        		pstmt = conn.prepareStatement(sql);
+	        		pstmt.setString(1, (String)paraMap.get("odrcode")); //채번해온 주문코드(명세서 번호)
+	        		pstmt.setString(2, arr_pnum[i]);
+	        		pstmt.setString(3, arr_oqty[i]);
+	        		pstmt.setString(4, arr_totalPrice[i]);
+	        		
+	        		pstmt.executeUpdate();
+	        		cnt++;
+	        	}//end of for()-----
+	        	//cnt 값이 배열길이와 같아야 최종 성공
+	        	if(cnt == arr_pnum.length) {
+	        		n2 = 1;
+	        	} System.out.println("확인용 n2: " +n2);
+	        	
+	        }//end of if(n1 == 1)----- 
+	        
+	        
+	        //4. 제품 테이블에서 제품번호에 해당하는 잔고량을 주문량 만큼 감하기 update 하기(수동커밋처리)
+	        if(n2 == 1) {
+	        	String[] arr_pnum = (String[]) paraMap.get("arr_pnum"); //제품번호
+	        	String[] arr_oqty = (String[]) paraMap.get("arr_oqty"); //주문량
+	        	
+	        	//위 배열들의 길이는 모두 똑같으므로 아무거나 사용해주기
+	        	int cnt = 0;
+	        	for(int i=0; i<arr_pnum.length; i++) {
+	        		sql = " update tbl_product set pqty = pqty - to_number(?) " 
+	                    + " where pnum = to_number(?) ";
+	        		pstmt = conn.prepareStatement(sql);
+	        		pstmt.setString(1, arr_oqty[i]); //채번해온 주문코드(명세서 번호)
+	        		pstmt.setString(2, arr_pnum[i]);
+	        		
+	        		pstmt.executeUpdate();
+	        		cnt++;
+	        	}//end of for()-----
+	        	//cnt 값이 배열길이와 같아야 최종 성공
+	        	if(cnt == arr_pnum.length) {
+	        		n3 = 1;
+	        	} System.out.println("확인용 n3: " +n3);
+	        	
+	        }//end of if(n2 == 1)-----
+
+	        
+	        //5. 장바구니 테이블에서 str_cartno_join 값에 해당하는 행들을 삭제(delete)하기(수동커밋처리)
+	        if(n3==1 && paraMap.get("arr_cartno")!=null) {
+	        	//삭제하기는 선택된 항목들에 대해 달라지는 값이 장바구니 번호뿐이므로 반복문 없이 in()을 이용할 수 있음
+	        	/*
+	        	sql = " delete from tbl_cart "
+	        		+ " where cartno in() ";	*/
+	        	// !!!! 중요 in 절은 위와 같이 위치홀더 ? 를 사용하면 안됨. !!!! //
+	        	// !!! 중요 in 절은 위와 같이 직접 변수로 처리해야 함. !!!
+	            // String.join(",", arr_cartno) 은 "8,7,5" 이러한 것이다.
+	            // 조심할 것은 in 에 사용되어지는 cartno 컬럼의 타입이 number 타입이라면 괜찮은데
+	            // 만약에 cartno 컬럼의 타입이 varchar2 타입이라면 "8,7,5" 와 같이 되어지면 오류가 발생한다. 
+	            // 그래서 cartno 컬럼의 타입이 varchar2 타입이라면 "8,7,5" 을 "'8','7','5'" 와 같이 변경해주어야 한다. 
+	        	
+	        	String[] arr_cartno = (String[]) paraMap.get("arr_cartno"); //장바구니 번호
+	        	//arr_cartno는 배열임! {"7", "5", "4"}
+	        	String cartno = String.join("','", arr_cartno); // 7','5','4
+	        	cartno = "'" + cartno + "'";
+	        	
+	        	System.out.println("확인용 cartno: " +cartno);
+	        	
+	        	sql = " delete from tbl_cart "
+	        		+ " where cartno in(" +cartno+ ") ";
+	        	pstmt = conn.prepareStatement(sql);
+	            n4 = pstmt.executeUpdate();
+	        	
+	            System.out.println("확인용 n4 : " + n4);
+	            
+	            if(n4 == arr_cartno.length) {
+	               n4 = 1;
+	            } System.out.println("확인용 n4 : " + n4);
+	            
+	        }//end of if(n3==1 && paraMap.get("arr_cartno")!=null)-----
+	        
+	        
+	        //장바구니에 상품이 없는 경우도 처리해주기
+	        if(n3==1 && paraMap.get("arr_cartno")!=null) {
+	        	//"제품 상세 정보" 페이지에서 "바로주문하기" 를 한 경우
+	        	//장바구니 번호인 paraMap.get("arr_cartno")가 없는 것
+	        	n4 = 1;
+	        }//end of if(n3==1 && paraMap.get("arr_cartno")!=null)-----
+	        
+	        
+	        //6. 회원 테이블에서 로그인한 사용자의 coin 액을 sum_totalPrice 만큼 감하고, point 를 sum_totalPoint 만큼 더하기(update)(수동커밋처리)
+	        if(n4 == 1) {
+	        	sql = " update tbl_member set coin = coin - ? "
+	                + "                     , point = point + ? "
+	                + " where userid = ? ";
+	                 
+                pstmt = conn.prepareStatement(sql);
+                pstmt.setInt(1, Integer.parseInt((String)paraMap.get("totalPrice")));
+                pstmt.setInt(2, Integer.parseInt((String)paraMap.get("totalPoint")));
+                pstmt.setString(3, (String)paraMap.get("userid"));
+                
+                n5 = pstmt.executeUpdate();
+                System.out.println("확인용 n5 : " + n5);
+	        }//end of if(n4 == 1)-----
+	        
+	        
+	        if(n1*n2*n3*n4*n5 == 1) {
+	        	//7. **** 모든처리가 성공되었을시 commit 하기(commit) ****
+	        	conn.commit();
+	        	conn.setAutoCommit(true); //커밋해주고 자동커밋 해주기
+	            System.out.println("확인용 n1*n2*n3*n4*n5 : " + n1*n2*n3*n4*n5);
+	        	
+	        	isSuccess = 1;
+	        }
+	        
+		} catch(SQLException e) {
+			//8. **** SQL 장애 발생시 rollback 하기(rollback) ****
+			conn.rollback();
+			conn.setAutoCommit(true); //롤백해준 후 자동커밋
+			
+			isSuccess = 0;
+		} finally {close();}
+		
+		return isSuccess;
+	}//end of public int orderAdd(Map<String, Object> paraMap) throws SQLException-----
+
+
+	//주문한 제품에 대해 email 보내기시 email 내용에 넣을 주문한 제품번호들에 대한 제품정보를 얻어오는 것.
+	@Override
+	public List<ProductDTO> getJumunProductList(String pnums) throws SQLException {
+		List<ProductDTO> productList = new ArrayList<>();
+		try {
+			conn = ds.getConnection();
+	        
+	        String sql =  " select pnum, pname, pcompany, pimage1, pimage2, pqty, price, saleprice, pcontent, point "
+	                 + "      , to_char(pinputdate, 'yyyy-mm-dd') AS pinputdate "
+	                 + " from tbl_product "
+	                 + " where pnum in("+ pnums +") ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        rs = pstmt.executeQuery();
+	        
+	        while(rs.next()) {
+	           ProductDTO proDto = new ProductDTO();
+	           
+	           proDto.setPnum(rs.getInt("pnum"));                // 제품번호
+	           proDto.setPname(rs.getString("pname"));           // 제품명
+	           proDto.setPcompany(rs.getString("pcompany"));     // 제조회사명
+	           proDto.setPimage1(rs.getString("pimage1"));       // 제품이미지1   이미지파일명
+	           proDto.setPimage2(rs.getString("pimage2"));       // 제품이미지2   이미지파일명
+	           proDto.setPqty(rs.getInt("pqty"));                // 제품 재고량
+	           proDto.setPrice(rs.getInt("price"));              // 제품 정가
+	           proDto.setSaleprice(rs.getInt("saleprice"));      // 제품 판매가(할인해서 팔 것이므로)
+	           proDto.setPcontent(rs.getString("pcontent"));      // 제품설명 
+	           proDto.setPoint(rs.getInt("point"));              // 포인트 점수        
+	           proDto.setPinputdate(rs.getString("pinputdate")); // 제품입고일자  
+	           
+	           productList.add(proDto);
+	        }// end of while(rs.next())-------------------------
+	        
+		} finally {close();}
+		return productList;
+	}//end of public List<ProductDTO> getJumunProductList(String pnums) throws SQLException-----
 	
 	
 	

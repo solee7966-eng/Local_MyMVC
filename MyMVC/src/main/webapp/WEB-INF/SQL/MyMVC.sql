@@ -967,3 +967,144 @@ where pnum = 119; --결과 있음
 select PRDMANUAL_SYSTEMFILENAME, PRDMANUAL_ORGINFILENAME
 from tbl_product
 where pnum = 32; --결과 없음
+
+
+
+
+
+
+-------- **** 장바구니 테이블 생성하기 **** ----------
+ desc tbl_member;
+ desc tbl_product;
+
+ create table tbl_cart
+ (cartno        number               not null   --  장바구니 번호             
+ ,fk_userid     varchar2(20)         not null   --  사용자ID            
+ ,fk_pnum       number(8)            not null   --  제품번호                
+ ,oqty          number(8) default 0  not null   --  주문량                   
+ ,registerday   date default sysdate            --  장바구니 입력날짜
+ ,constraint PK_shopping_cart_cartno primary key(cartno)
+ ,constraint FK_shopping_cart_fk_userid foreign key(fk_userid) references tbl_member(userid) 
+ ,constraint FK_shopping_cart_fk_pnum foreign key(fk_pnum) references tbl_product(pnum)
+ );
+ -- Table TBL_CART이(가) 생성되었습니다.
+
+ create sequence seq_tbl_cart_cartno
+ start with 1
+ increment by 1
+ nomaxvalue
+ nominvalue
+ nocycle
+ nocache;
+ 
+ select * from tbl_member
+ where userid = 'iyou';
+ 
+ select cartno, fk_userid, fk_pnum, oqty, registerday 
+ from tbl_cart
+ order by cartno asc;
+ 
+ 
+SELECT C.cartno, C.fk_userid, C.fk_pnum, C.oqty, P.pname, P.pimage1, P.saleprice, P.point, P.pqty 
+FROM (
+    select cartno, fk_userid, fk_pnum, oqty, registerday 
+    from tbl_cart
+    where fk_userid = 'solee7966') C
+JOIN tbl_product P
+ON C.fk_pnum = P.pnum 
+ORDER BY C.cartno DESC;
+
+
+SELECT NVL(SUM(C.oqty * P.saleprice), 0) AS SUMTOTALPRICE,
+       NVL(SUM(C.oqty * P.point), 0) AS SUMTOTALPOINT
+FROM (
+    select fk_pnum, oqty
+    from tbl_cart
+    where fk_userid = 'iyou1') C
+JOIN tbl_product P
+ON C.fk_pnum = P.pnum;
+
+
+
+show user;
+ ------------------ >>> 주문관련 테이블 <<< -----------------------------
+-- [1] 주문 테이블    : tbl_order
+-- [2] 주문상세 테이블 : tbl_orderdetail
+
+
+-- *** "주문" 테이블 *** --
+create table tbl_order
+(odrcode        varchar2(20) not null          -- 주문코드(명세서번호)  주문코드 형식 : s+날짜+sequence ==> s20260114-1 , s20260114-2 , s20260114-3
+                                               --                                                  s20260115-4 , s20260115-5 , s20260115-6
+,fk_userid      varchar2(20) not null          -- 사용자ID
+,odrtotalPrice  number       not null          -- 주문총액
+,odrtotalPoint  number       not null          -- 주문총포인트
+,odrdate        date default sysdate not null  -- 주문일자
+,constraint PK_tbl_order_odrcode primary key(odrcode)
+,constraint FK_tbl_order_fk_userid foreign key(fk_userid) references tbl_member(userid)
+);
+-- Table TBL_ORDER이(가) 생성되었습니다.
+
+-- "주문코드(명세서번호) 시퀀스" 생성
+create sequence seq_tbl_order
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+-- Sequence SEQ_TBL_ORDER이(가) 생성되었습니다.
+
+select 's'||to_char(sysdate,'yyyymmdd')||'-'||seq_tbl_order.nextval AS odrcode
+from dual;
+-- s20250103-1 
+
+select odrcode, fk_userid, 
+       odrtotalPrice, odrtotalPoint,
+       to_char(odrdate, 'yyyy-mm-dd hh24:mi:ss') as odrdate
+from tbl_order
+order by odrcode desc;
+
+
+-- *** "주문상세" 테이블 *** --
+create table tbl_orderdetail
+(odrseqnum      number               not null   -- 주문상세 일련번호
+,fk_odrcode     varchar2(20)         not null   -- 주문코드(명세서번호)
+,fk_pnum        number(8)            not null   -- 제품번호
+,oqty           number               not null   -- 주문량
+,odrprice       number               not null   -- "주문할 그때 그당시의 실제 판매가격" ==> insert 시 tbl_product 테이블에서 해당제품의 saleprice 컬럼값을 읽어다가 넣어주어야 한다.
+,deliverStatus  number(1) default 1  not null   -- 배송상태( 1 : 주문만 받음,  2 : 배송중,  3 : 배송완료)
+,deliverDate    date                            -- 배송완료일자  default 는 null 로 함.
+,constraint PK_tbl_orderdetail_odrseqnum  primary key(odrseqnum)
+,constraint FK_tbl_orderdetail_fk_odrcode foreign key(fk_odrcode) references tbl_order(odrcode) on delete cascade
+,constraint FK_tbl_orderdetail_fk_pnum foreign key(fk_pnum) references tbl_product(pnum)
+,constraint CK_tbl_orderdetail check( deliverStatus in(1, 2, 3) )
+);
+-- Table TBL_ORDERDETAIL이(가) 생성되었습니다.
+
+
+-- "주문상세 일련번호 시퀀스" 생성
+create sequence seq_tbl_orderdetail
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+-- Sequence SEQ_TBL_ORDERDETAIL이(가) 생성되었습니다.
+
+-----------------------------------------------------------------
+select *
+from tbl_order
+order by odrdate desc; 
+ 
+select *
+from tbl_orderdetail
+order by odrseqnum desc;
+
+select * from tbl_member
+where userid = 'solee7966';
+
+update tbl_member set coin = coin + 2600000
+where userid = 'solee7966';
+commit;
