@@ -1113,4 +1113,55 @@ commit;
 select * from tbl_orderdetail;
 
 select * from tbl_product;
+select * from tbl_product_imagefile;
+
+
+show user;
+
+-------- **** 매장찾기(카카오지도) 테이블 생성하기 **** ----------
+create table tbl_map 
+(storeID       varchar2(20) not null   --  매장id
+,storeName     varchar2(100) not null  --  매장명
+,storeUrl      varchar2(200)            -- 매장 홈페이지(URL)주소
+,storeImg      varchar2(200) not null   -- 매장소개 이미지파일명  
+,storeAddress  varchar2(200) not null   -- 매장주소 및 매장전화번호
+,lat           number not null          -- 위도
+,lng           number not null          -- 경도 
+,zindex        number not null          -- zindex 
+,constraint PK_tbl_map primary key(storeID)
+,constraint UQ_tbl_map_zindex unique(zindex)
+);
+-- Table TBL_MAP이(가) 생성되었습니다.
+
+create sequence seq_tbl_map_zindex
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+-- Sequence SEQ_TBL_MAP_ZINDEX이(가) 생성되었습니다.
+
+insert into tbl_map(storeID, storeName, storeUrl, storeImg, storeAddress, lat, lng, zindex)
+values('store1','롯데백화점 본점','https://place.map.kakao.com/7858517','lotte02.png','서울 중구 을지로 30 (T)02-771-2500',37.56511284953554,126.98187860455485,1);
+
+insert into tbl_map(storeID, storeName, storeUrl, storeImg, storeAddress, lat, lng, zindex)
+values('store2','신세계백화점 본점','https://place.map.kakao.com/7969138','shinsegae.png','서울 중구 소공로 63 (T)1588-1234',37.56091181255155,126.98098265772731,2);
+
+insert into tbl_map(storeID, storeName, storeUrl, storeImg, storeAddress, lat, lng, zindex)
+values('store3','미래에셋센터원빌딩','https://place.map.kakao.com/13057692','miraeeset.png','서울 중구 을지로5길 26 (T)02-6030-0100',37.567386065415086,126.98512381778167,3);
+
+insert into tbl_map(storeID, storeName, storeUrl, storeImg, storeAddress, lat, lng, zindex)
+values('store4','현대백화점신촌점','https://place.map.kakao.com/21695719','hyundai01.png','서울 서대문구 신촌로 83 현대백화점신촌점 (T)02-3145-2233',37.556005,126.935699,4);
+
+insert into tbl_map(storeID, storeName, storeUrl, storeImg, storeAddress, lat, lng, zindex)
+values('store5','쌍용강북교육센터','https://place.map.kakao.com/16530319','sist01.jpg','서울 마포구 월드컵북로 21 풍성빌딩 2~4층 (T)02-336-8546',37.556583,126.919557,5);
+
+commit; 
+
+select storeID, storeName, storeUrl, storeImg, storeAddress, lat, lng, zindex
+from tbl_map
+order by zindex asc;
+
+select * from tbl_product;
 select * from tbl_product_imagefile
