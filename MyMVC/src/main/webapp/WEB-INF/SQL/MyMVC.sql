@@ -1093,6 +1093,7 @@ nocycle
 nocache;
 -- Sequence SEQ_TBL_ORDERDETAIL이(가) 생성되었습니다.
 
+commit;
 -----------------------------------------------------------------
 select *
 from tbl_order
@@ -1108,3 +1109,8 @@ where userid = 'solee7966';
 update tbl_member set coin = coin + 2600000
 where userid = 'solee7966';
 commit;
+
+select * from tbl_orderdetail;
+
+select * from tbl_product;
+select * from tbl_product_imagefile

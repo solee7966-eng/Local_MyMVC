@@ -835,6 +835,40 @@ public class ProductDAO_imple implements ProductDAO {
 		} finally {close();}
 		return productList;
 	}//end of public List<ProductDTO> getJumunProductList(String pnums) throws SQLException-----
+
+
+	
+	//tbl_map(위,경도) 테이블에 있는 정보를 가져오기(select)
+	@Override
+	public List<Map<String, String>> selectStoreMap() throws SQLException {
+		List<Map<String, String>> storeMapList = new ArrayList<Map<String,String>>();
+		try {
+			conn = ds.getConnection();
+	         
+	        String sql = " select storeID, storeName, storeUrl, storeImg, storeAddress, lat, lng, zindex " + 
+	                   " from tbl_map " + 
+	                   " order by zindex asc ";
+	        
+	        pstmt = conn.prepareStatement(sql);
+	        rs = pstmt.executeQuery();
+	        
+	        while(rs.next()) {
+	           Map<String, String> map = new HashMap<>();
+	           map.put("STOREID", rs.getString("STOREID"));
+	           map.put("STORENAME", rs.getString("STORENAME"));
+	           map.put("STOREURL", rs.getString("STOREURL"));
+	           map.put("STOREIMG", rs.getString("STOREIMG"));
+	           map.put("STOREADDRESS", rs.getString("STOREADDRESS"));
+	           map.put("LAT", rs.getString("LAT"));
+	           map.put("LNG", rs.getString("LNG"));
+	           map.put("ZINDEX", rs.getString("ZINDEX"));
+	                       
+	           storeMapList.add(map); 
+	        }// end of while-----------------
+		}
+		finally {close();}
+		return storeMapList;
+	}//end of public List<Map<String, String>> selectStoreMap() throws SQLException-----
 	
 	
 	

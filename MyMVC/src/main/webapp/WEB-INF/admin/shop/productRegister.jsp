@@ -110,15 +110,13 @@
 	            data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAeAB4AAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAg 
 	            이러한 형태로 출력되며, img.src 의 값으로 넣어서 사용한다.
 	         */ 
-	         
 	          document.getElementById("previewImg").src = fileReader.result;
 	      };     
-	   
 		  //-----------------------------------------------------//
+		  
 	      // 첨부한 파일의 총량을 누적하는 용도
 		  total_fileSize += input_file.files[0].size;
 		  //-----------------------------------------------------//
-		  
 	  });
 	  // ==>> 제품이미지 파일선택을 선택하면 화면에 이미지를 미리 보여주기 끝 <<== //
 	  

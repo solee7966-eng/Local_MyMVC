@@ -80,6 +80,9 @@ public interface ProductDAO {
 
 	   //주문한 제품에 대해 email 보내기시 email 내용에 넣을 주문한 제품번호들에 대한 제품정보를 얻어오는 것.
 	   List<ProductDTO> getJumunProductList(String pnums) throws SQLException;
+
+	   //tbl_map(위,경도) 테이블에 있는 정보를 가져오기(select)
+	   List<Map<String, String>> selectStoreMap() throws SQLException;
 	   
 	   
 	   

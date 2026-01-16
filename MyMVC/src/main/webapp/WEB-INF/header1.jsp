@@ -60,6 +60,17 @@
 			<li class="nav-item">
 				<a class="nav-link menufont_size" href="<%=ctxPath%>/shop/mallHomeScroll.up">쇼밍몰홈[스크롤]</a>
 			</li>
+			<li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle menufont_size text-info" href="#" id="navbarDropdown" data-toggle="dropdown"> 
+                 매장찾기                                  <%-- .text-info 는 글자색으로 청록색임 --%>  
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                 <a class="dropdown-item text-info" href="<%= ctxPath %>/shop/storeLocation1.up">매장찾기1</a>
+                 <a class="dropdown-item text-info" href="<%= ctxPath %>/shop/storeLocation2.up">매장찾기2</a>
+                 <div class="dropdown-divider"></div>
+                 <a class="dropdown-item text-info" href="<%= ctxPath %>/shop/latLngSearch.up">위.경도 찾기</a>
+              </div>
+          	</li>
 			
 			
 			<!-- admin이 아닌 일반 사용자로 로그인한 경우에만 뜨도록 하기 -->
