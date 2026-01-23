@@ -182,7 +182,7 @@
 <%-- sessionScope. => session 저장소! 이것은 생략할 수 없고 반드시 명시해주어야 함! --%>
 <%-- <c:if test=" ${empty sessionScope.loginuser} "> 와 같이 test="" 에 test=" " 와 같이 공백을 넣어주면 꽝이다.!!! --%>
 <c:if test="${empty sessionScope.loginUser}">
-	<form name="loginFrm" action="<%= ctx_Path%>/login/login.up" method="post">
+	<form name="loginFrm" action="<%=ctx_Path%>/login/login.up" method="post">
 		<table id="loginTbl">
           <thead>
               <tr>

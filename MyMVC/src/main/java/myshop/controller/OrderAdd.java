@@ -72,12 +72,12 @@ public class OrderAdd extends AbstractController {
 			String str_totalPrice_join = request.getParameter("str_totalPrice_join");	//주문가격을 합한 것
 			String str_cartno_join = request.getParameter("str_cartno_join");		//장바구니 번호를 합한 것
 	        
-			System.out.println(totalPrice+"\n"+      //596000
-					totalPoint+"\n"+                 //650
-					str_pnum_join+"\n"+              //119,68,65
-					str_oqty_join+"\n"+              //8,4,2
-					str_totalPrice_join+"\n"+        //96000,480000,20000
-					str_cartno_join);                //7,5,4
+			System.out.println("totalPrice" +totalPrice+"\n"+      //596000
+					"totalPoint" +totalPoint+"\n"+                 //650
+					"str_pnum_join" +str_pnum_join+"\n"+              //119,68,65
+					"str_oqty_join" +str_oqty_join+"\n"+              //8,4,2
+					"str_totalPrice_join" +str_totalPrice_join+"\n"+        //96000,480000,20000
+					"str_cartno_join" +str_cartno_join);                //7,5,4
 			
 			// ===== Transaction 처리하기 ===== //
 	        // 1. 주문 테이블에 입력되어야할 주문전표를 채번(select)하기  

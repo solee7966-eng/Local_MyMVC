@@ -5,6 +5,7 @@ import java.util.List;
 import common.controller.AbstractController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import myshop.domain.ProductDTO;
 import myshop.model.ProductDAO;
 import myshop.model.ProductDAO_imple;
@@ -18,6 +19,9 @@ public class ProdView extends AbstractController {
 
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//super.goBackURL(request); //HttpSession session에 "goBackURL"이라는 키값으로 현재 상품페이지 정보 URL 값을 저장해둠
+		
+		
 		//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 		// **** GET 방식을 막는 또 다른 방법 ==> 웹브라우저 주소창에서 직접입력하지 못하게 막아버리면 된다. **** //
 		//이것의 단점은 웹브라우저에서 북마크(즐겨찾기)를 했을 경우 접속이 안된다는 것이다.

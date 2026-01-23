@@ -83,8 +83,6 @@ public class Login extends AbstractController {
             그러므로 어떤 정보를 여러 클래스 또는 여러 jsp 페이지에서 공통적으로 사용하고자 한다라면
             세션(session)에 저장해야 한다.!!!!          
         */
-		
-		
 		MemberDTO loginUser = mbDao.login(paraMap); // 로그인 한 회원정보 가져오기
 		if(loginUser != null) {
 			// null 값이 아니라면 로그인에 성공했다는 것!
@@ -96,7 +94,6 @@ public class Login extends AbstractController {
 			
 			// session(세션)에 로그인 되어진 사용자 정보인 loginuser 를 키이름을 "loginuser" 으로 저장시켜두는 것이다.
 			session.setAttribute("loginUser", loginUser);
-			
 			
 			// 마지막으로 로그인 한것이 1년 이상 지난 경우 
 			if(loginUser.getIdle() == 1) {
@@ -113,7 +110,6 @@ public class Login extends AbstractController {
 	            
 	            return; // 메소드 종료
 			}
-			
 			
 			// ~~~~~~~~~~ "아이디저장" 을 쿠기(Cookie)를 사용하여 처리하기 위한 것 시작 ~~~~~~~~~~ //
 			if(saveid != null) {
@@ -163,7 +159,6 @@ public class Login extends AbstractController {
 			}
 			// ~~~~~~~~~~ "아이디저장" 을 쿠기(Cookie)를 사용하여 처리하기 위한 것 끝 ~~~~~~~~~~ //
 			
-			
 			// 비밀번호를 변경한 지 3개월 이상이 된 경우
 			if(loginUser.isRequirePwdChange()) {
 				String message = "비밀번호를 변경하신지 3개월이 지났습니다.\\n암호 변경 페이지로 이동합니다.";
@@ -180,8 +175,38 @@ public class Login extends AbstractController {
 			}
 			
 			
-			super.setRedirect(true); // 페이지를 이동시킨다! 
-			super.setViewPage(request.getContextPath()+"/index.up"); // 시작페이지로 이동해주기!
+			//===========================================================//
+			/*
+			super.setRedirect(true); // 페이지를 이동시킨다!
+			String goBackURL = (String)session.getAttribute("goBackURL");
+			if(goBackURL != null) {
+				//로그인 하기 이전에 index가 아닌 다른 페이지에 있었다면
+				//로그인 후 그 페이지로 다시 이동시키기
+				//System.out.println("goBackURL: " +goBackURL);
+				//goBackURL: /shop/prodView.up?pnum=119
+				
+				//HttpSession session에 "goBackURL"이라는 키값을 폐기처분 해주기
+				session.removeAttribute(goBackURL);
+				super.setViewPage(request.getContextPath() + goBackURL);
+			} else {
+				super.setViewPage(request.getContextPath()+"/index.up"); // 시작페이지로 이동해주기!
+			}
+			//===========================================================//
+			*/
+			
+
+			super.setRedirect(true); // 페이지를 이동시킨다!
+			//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+			String referer = request.getHeader("referer");
+			//System.out.println("referer: " +referer);
+			if(referer != null) {
+				super.setViewPage(referer);
+			} else {
+				super.setViewPage(request.getContextPath()+"/index.up");
+			}
+			//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+			
+			
 		} else {
 			//System.out.println("확인용 로그인 실패..");
 			String message = "로그인 실패";

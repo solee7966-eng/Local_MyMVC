@@ -72,7 +72,7 @@
 	                 <a class="dropdown-item text-primary" href="<%= ctxPath %>/admin/member/memberList.up">회원목록</a>
 	                 <a class="dropdown-item text-primary" href="<%= ctxPath %>/admin/shop/productRegister.up">제품등록</a>
 	                 <div class="dropdown-divider"></div>
-	                 <a class="dropdown-item text-primary" href="<%= ctxPath %>/admin/shop/orderList.up">전체주문내역</a>
+	                 <a class="dropdown-item text-primary" href="<%= ctxPath %>/shop/orderList.up">전체주문내역</a>
 	              </div>
 	           </li>
 	      </c:if>     

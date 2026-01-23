@@ -5,7 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MemberDTO {
-// insert + select 용 
+// insert + select 용
+	private int userseq;
 	private String userid;             // 회원아이디
 	private String pwd;                // 비밀번호 (SHA-256 암호화 대상)
 	private String name;               // 회원명
@@ -32,7 +33,12 @@ public class MemberDTO {
 	
 	
 //	============================================== //
-	
+	public int getUserseq() {
+		return userseq;
+	}
+	public void setUserseq(int userseq) {
+		this.userseq = userseq;
+	}
 	public String getUserid() {
 		return userid;
 	}

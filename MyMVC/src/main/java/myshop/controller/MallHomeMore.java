@@ -19,6 +19,8 @@ public class MallHomeMore extends AbstractController {
 	
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//super.goBackURL(request); //HttpSession session에 "goBackURL"이라는 키값으로 현재 상품페이지 정보 URL 값을 저장해둠
+		
 		//HIT 상품의 전체 개수를 알아오기
 		int totalHITCount = pdDao.totalPspecCount(1);
 		//System.out.println("확인용 totalHITCount: " +totalHITCount);

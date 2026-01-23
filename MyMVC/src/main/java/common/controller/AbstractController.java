@@ -3,6 +3,7 @@ package common.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import member.domain.MemberDTO;
+import my.util.MyUtil;
 
 /*	=== 다음의 나오는 것은 우리끼리한 약속이다. ===
     	※ view 단 페이지(.jsp)로 이동시 forward 방법(dispatcher)으로 이동시키고자 한다라면 
@@ -62,5 +63,15 @@ public abstract class AbstractController implements InterCommand {
 		else {return false; } //로그인을 하지 않은 경우
 		
 	}//end of checkLogin()-----
+	
+	
+	// 로그인 또는 로그아웃을 하면 시작페이지로 가는 것이 아니라 방금 보았던 그 페이지로 그대로 가기 위한 것임.
+	public void goBackURL(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		session.setAttribute("goBackURL", MyUtil.getCurrentURL(request)); 
+	}
+	
+	
+	
 	
 }//end of public abstract class AbstractController implements InterCommand-----

@@ -4,10 +4,12 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import member.domain.MemberDTO;
 import myshop.domain.CartDTO;
 import myshop.domain.CategoryDTO;
 import myshop.domain.ImageDTO;
 import myshop.domain.ProductDTO;
+import myshop.domain.PurchaseReviewsDTO;
 import myshop.domain.SpecDTO;
 
 public interface ProductDAO {
@@ -83,6 +85,62 @@ public interface ProductDAO {
 
 	   //tbl_map(위,경도) 테이블에 있는 정보를 가져오기(select)
 	   List<Map<String, String>> selectStoreMap() throws SQLException;
+
+	   //나의 카테고리별주문 통계정보 알아오기 
+	   List<Map<String, String>> myPurchase_byCategory(String userid) throws SQLException;
+
+	   //나의 카테고리별주문 월별 통계정보 알아오기
+	   List<Map<String, String>> myPurchase_byMonth_byCategory(String userid) throws SQLException;
+
+	   //로그인한 사용자가 특정 제품을 구매했는지 여부를 알아오는 것. 구매했다라면 true, 구매하지 않았다면 false 를 리턴함. 
+	   boolean isOrder(Map<String, String> paraMap) throws SQLException;
+
+	   //특정 회원이 특정 제품에 대해 좋아요에 투표하기(insert)
+	   int likeAdd(Map<String, String> paraMap) throws SQLException;
+	   //특정 회원이 특정 제품에 대해 싫어요에 투표하기(insert)
+	   int dislikeAdd(Map<String, String> paraMap) throws SQLException;
+
+	   //특정 제품에 대한 좋아요, 싫어요의 투표결과(select)
+	   Map<String, Integer> getLikeDislikeCount(String pnum) throws SQLException;
+
+	   //특정 사용자가 특정 제품에 대해 상품후기를 입력하기(insert)
+	   int addReview(PurchaseReviewsDTO reviewDto) throws SQLException;
+
+	   //특정 제품의 사용후기를 조회하기(select)
+	   List<PurchaseReviewsDTO> reviewList(String fk_pnum) throws SQLException;
+
+	   //특정 제품의 사용후기를 수정하기(update)
+	   int reviewUpdate(Map<String, String> paraMap) throws SQLException;
+
+	   //특정 제품의 사용후기를 삭제하기(delete)
+	   int reviewDel(String review_seq) throws SQLException;
+
+	   //cnum(카테고리번호)이 tbl_category 테이블에 존재하는지 존재하지 않는지 알아오기 
+	   boolean isExist_cnum(String cnum) throws SQLException;
+
+	   //페이징 처리를 위한 특정 카테고리에 대한 총페이지수 알아오기
+	   int getTotalPage(String cnum) throws SQLException;
+
+	   //특정한 카테고리에서 특정 페이지번호에 해당하는 제품들을 조회해오기 
+	   List<ProductDTO> selectProductByCategory(Map<String, String> paraMap) throws SQLException;
+
+	   // *** 페이징 처리를 위해서 먼저 주문개수를 알아오기 ***
+	   // 1. 일반 사용자로 로그인 한 경우는 자신이 주문한 개수만 알아오고,
+	   // 2. 관리자(admin)으로 로그인 한 경우 모든 사용자들의 주문한 개수를 알아온다.
+	   int getTotalCountOrder(String userid) throws SQLException;
+
+	   // *** 관리자가 아닌 일반사용자로 로그인 했을 경우에는 자신이 주문한 내역만 페이징 처리하여 조회를 해오고, 
+	   //관리자로 로그인을 했을 경우에는 모든 사용자들의 주문내역을 페이징 처리하여 조회해온다. 
+	   List<Map<String, String>> getOrderList(Map<String, String> paraMap) throws SQLException;
+
+	   //영수증전표(odrcode)소유주에 대한 사용자 정보를 조회해오는 것. 
+	   MemberDTO odrcodeOwnerMemberInfo(String odrcode) throws SQLException;
+
+	   //tbl_orderdetail 테이블의 deliverstatus(배송상태) 컬럼의 값을 2(배송시작)로 변경하기 
+	   int updateDeliverStart(String odrcodePnum) throws SQLException;
+
+	   //tbl_orderdetail 테이블의 deliverstatus(배송상태) 컬럼의 값을 3(배송완료)로 변경하기
+	   int updateDeliverEnd(String odrcodePnum) throws SQLException;
 	   
 	   
 	   

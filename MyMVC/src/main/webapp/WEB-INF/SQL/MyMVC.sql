@@ -1164,4 +1164,168 @@ from tbl_map
 order by zindex asc;
 
 select * from tbl_product;
-select * from tbl_product_imagefile
+select * from tbl_product_imagefile;
+
+
+select * from tbl_member
+where userid = 'eomjh';
+
+update tbl_member set coin = 500000, point = 30000
+where userid = 'eomjh';
+commit;
+
+
+select *
+from tbl_order
+order by odrdate desc;
+ 
+select *
+from tbl_orderdetail
+order by odrseqnum desc;
+
+
+-- 나의 카테고리 별 주문통계 보기
+WITH
+O AS(
+    SELECT odrcode
+    FROM tbl_order --주문 테이블
+    WHERE fk_userid = 'solee7966'
+) ,
+OD AS (
+    SELECT fk_odrcode, fk_pnum, oqty, odrprice
+    FROM tbl_orderdetail --주문상세 테이블
+)
+SELECT C.cname
+      ,count(C.cname) AS cnt
+      ,SUM(OD.oqty * OD.odrprice) AS SUMPAY
+      ,ROUND(SUM(OD.oqty * OD.odrprice)/(SELECT SUM(OD.oqty * OD.odrprice)
+                                         FROM O JOIN OD
+                                         ON O.odrcode = OD.fk_odrcode) * 100 ,2) AS SUMPAY_PCT
+FROM O JOIN OD
+ON O.odrcode = OD.fk_odrcode
+JOIN tbl_product P --상품 테이블
+ON OD.fk_pnum = P.pnum
+JOIN tbl_category C -- 카테고리 테이블
+ON P.fk_cnum = C.cnum
+GROUP BY C.cname
+ORDER BY 3 DESC;
+
+
+-- 나의 카테고리 별 월별 주문통계 보기 --
+WITH 
+O AS 
+(SELECT odrcode, odrdate 
+ FROM tbl_order 
+ WHERE fk_userid = 'solee7966' and to_char(odrdate, 'yyyy') = to_char(sysdate, 'yyyy') 
+ ) 
+, 
+OD AS 
+(SELECT fk_odrcode, fk_pnum, oqty, odrprice 
+ FROM tbl_orderdetail 
+) 
+SELECT C.cname 
+    ,COUNT(C.cname) AS CNT 
+    ,SUM(OD.oqty * OD.odrprice) AS SUMPAY 
+    ,round( SUM(OD.oqty * OD.odrprice)/( SELECT SUM(OD.oqty * OD.odrprice) 
+                                           FROM O JOIN OD 
+                                           ON O.odrcode = OD.fk_odrcode)*100, 2) AS SUMPAY_PCT 
+    ,SUM( decode( to_char(O.odrdate,'mm'), '01', OD.oqty * OD.odrprice, 0) ) AS M_01 
+    ,SUM( decode( to_char(O.odrdate,'mm'), '02', OD.oqty * OD.odrprice, 0) ) AS M_02 
+    ,SUM( decode( to_char(O.odrdate,'mm'), '03', OD.oqty * OD.odrprice, 0) ) AS M_03 
+    ,SUM( decode( to_char(O.odrdate,'mm'), '04', OD.oqty * OD.odrprice, 0) ) AS M_04 
+    ,SUM( decode( to_char(O.odrdate,'mm'), '05', OD.oqty * OD.odrprice, 0) ) AS M_05 
+    ,SUM( decode( to_char(O.odrdate,'mm'), '06', OD.oqty * OD.odrprice, 0) ) AS M_06 
+    ,SUM( decode( to_char(O.odrdate,'mm'), '07', OD.oqty * OD.odrprice, 0) ) AS M_07 
+    ,SUM( decode( to_char(O.odrdate,'mm'), '08', OD.oqty * OD.odrprice, 0) ) AS M_08 
+    ,SUM( decode( to_char(O.odrdate,'mm'), '09', OD.oqty * OD.odrprice, 0) ) AS M_09 
+    ,SUM( decode( to_char(O.odrdate,'mm'), '10', OD.oqty * OD.odrprice, 0) ) AS M_10 
+    ,SUM( decode( to_char(O.odrdate,'mm'), '11', OD.oqty * OD.odrprice, 0) ) AS M_11 
+    ,SUM( decode( to_char(O.odrdate,'mm'), '12', OD.oqty * OD.odrprice, 0) ) AS M_12 
+FROM O JOIN OD 
+ON O.odrcode = OD.fk_odrcode 
+JOIN tbl_product P 
+ON OD.fk_pnum = P.pnum 
+JOIN tbl_category C 
+ON P.fk_cnum = C.cnum 
+GROUP BY C.cname 
+ORDER BY 3 desc;
+
+
+
+
+----- *** 좋아요, 싫어요 (투표) 테이블 생성하기 *** ----- 
+create table tbl_product_like
+(fk_userid   varchar2(40) not null 
+,fk_pnum     number(8) not null
+,constraint  PK_tbl_product_like primary key(fk_userid,fk_pnum)
+,constraint  FK_tbl_product_like_userid foreign key(fk_userid) references tbl_member(userid)
+,constraint  FK_tbl_product_like_pnum foreign key(fk_pnum) references tbl_product(pnum) on delete cascade
+);
+-- Table TBL_PRODUCT_LIKE이(가) 생성되었습니다.
+
+create table tbl_product_dislike
+(fk_userid   varchar2(40) not null 
+,fk_pnum     number(8) not null
+,constraint  PK_tbl_product_dislike primary key(fk_userid,fk_pnum)
+,constraint  FK_tbl_product_dislike_userid foreign key(fk_userid) references tbl_member(userid)
+,constraint  FK_tbl_product_dislike_pnum foreign key(fk_pnum) references tbl_product(pnum) on delete cascade
+);
+-- Table TBL_PRODUCT_DISLIKE이(가) 생성되었습니다.
+----------------------------------------------------------------------------------------------
+
+select D.odrseqnum, D.fk_pnum
+from tbl_orderdetail D JOIN tbl_order O
+on D.fk_odrcode = O.odrcode
+where D.fk_pnum = to_number('119') and O.fk_userid = 'solee7966';
+
+
+
+select * 
+from tbl_product_like;
+
+select *
+from tbl_product_dislike;
+
+
+SELECT (
+    SELECT count(*)
+    FROM tbl_product_like
+    WHERE fk_pnum = 119) AS likeCNT,
+    (
+    SELECT count(*)
+    FROM tbl_product_dislike
+    WHERE fk_pnum = 119) AS dislikeCNT
+FROM dual;
+
+
+select * from tbl_product_imagefile;
+
+
+
+-------- **** 상품구매 후기 테이블 생성하기 **** ----------
+create table tbl_purchase_reviews
+(review_seq          number 
+,fk_userid           varchar2(20)   not null   -- 사용자ID       
+,fk_pnum             number(8)      not null   -- 제품번호(foreign key)
+,contents            varchar2(4000) not null
+,writeDate           date default sysdate
+,constraint PK_purchase_reviews primary key(review_seq)
+,constraint UQ_purchase_reviews unique(fk_userid, fk_pnum)
+,constraint FK_purchase_reviews_userid foreign key(fk_userid) references tbl_member(userid) on delete cascade 
+,constraint FK_purchase_reviews_pnum foreign key(fk_pnum) references tbl_product(pnum) on delete cascade
+);
+-- 로그인하여 실제 해당 제품을 구매했을 때만 딱 1번만 작성할 수 있는 것. 제품후기를 삭제했을 경우에는 다시 작성할 수 있는 것임. 
+
+
+create sequence seq_purchase_reviews
+start with 1
+increment by 1
+nomaxvalue
+nominvalue
+nocycle
+nocache;
+-- Sequence SEQ_PURCHASE_REVIEWS이(가) 생성되었습니다.
+
+select *
+from tbl_purchase_reviews
+order by review_seq desc;

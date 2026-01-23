@@ -82,7 +82,7 @@
 					</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<a class="dropdown-item text-info" href="<%=ctxPath%>/shop/cartList.up">장바구니</a>
-						<a class="dropdown-item text-info" href="<%=ctxPath%>/shop.orderList.up">나의주문내역</a>
+						<a class="dropdown-item text-info" href="<%=ctxPath%>/shop/orderList.up">나의주문내역</a>
 					<div class="dropdown-divider"></div>
 						<a class="dropdown-item text-info" href="<%=ctxPath%>/shop/chart.up">주문통계차트보기</a>
 					</div>
